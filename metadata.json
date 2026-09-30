@@ -1,0 +1,6 @@
+{
+  "name": "BMW Oblivion V2 - Casino WinGo Neural AI Predictor",
+  "description": "Casino WinGo 1-Min Neural AI Predictor with Live 1000-Result Pattern Scanner, authentic 3D WinGo Lottery Balls, and Dual-Level Prediction Engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

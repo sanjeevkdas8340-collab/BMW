@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes popBounce {
+    0% {
+      transform: scale(0.35) translateY(40px);
+      opacity: 0;
+    }
+    55% {
+      transform: scale(1.08) translateY(-8px);
+      opacity: 1;
+    }
+    75% {
+      transform: scale(0.96) translateY(3px);
+    }
+    100% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes raysSpin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes confettiFall {
+    0% {
+      transform: translateY(-20px) rotate(0deg);
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(180px) rotate(420deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes dragonAuraPulse {
+    0%, 100% {
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.4), 0 0 50px rgba(255, 39, 64, 0.35);
+      border-color: rgba(0, 229, 255, 0.6);
+    }
+    50% {
+      box-shadow: 0 0 45px rgba(0, 229, 255, 0.75), 0 0 85px rgba(255, 39, 64, 0.65);
+      border-color: rgba(255, 39, 64, 0.8);
+    }
+  }
+
+  @keyframes ballDrop {
+    0% {
+      transform: translateY(-60px) scale(0.5);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(10px) scale(1.1);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(-4px) scale(0.98);
+    }
+    100% {
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-9px) rotate(-1deg); }
+    40% { transform: translateX(9px) rotate(1deg); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  @keyframes tickerMove {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Custom Animation Utility Classes */
+.animate-popBounce {
+  animation: popBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-raysSpin {
+  animation: raysSpin 6s linear infinite;
+}
+
+.animate-confetti {
+  animation: confettiFall 2.4s linear infinite;
+}
+
+.animate-dragonPulse {
+  animation: dragonAuraPulse 2.8s ease-in-out infinite;
+}
+
+.animate-ballDrop {
+  animation: ballDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-shake {
+  animation: shake 0.45s ease-in-out both;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease both;
+}
