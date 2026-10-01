@@ -21,6 +21,7 @@ export interface PredictionRecord {
   verified: boolean;
   demo?: boolean;
   timestamp: number;
+  level?: number;
 }
 
 export interface PatternMatch {
@@ -55,6 +56,19 @@ export interface MarketRegime {
   name: 'TRENDING' | 'CHOPPY' | 'NEUTRAL';
   icon: string;
   description: string;
+}
+
+export interface DeepPatternAnalysis {
+  patternType: string;
+  depthStages: string[];
+  currentStage: string;
+  cycleRepetition: number;
+  harmonicParity: 'ODD_DOMINANT' | 'EVEN_DOMINANT' | 'BALANCED';
+  transitionEntropy: number; // 0 to 100
+  historicalMatchRate: number;
+  layer1Status: string;
+  layer2Status: string;
+  layer3Status: string;
 }
 
 export interface KeyLicense {

@@ -11,6 +11,7 @@ import {
   RotateCcw,
   CheckCircle2,
 } from 'lucide-react';
+import { CasinoHostessAvatar } from './CasinoHostessAvatar';
 import { playClickSound } from '../utils/sound';
 
 interface BetAdvisorModalProps {
@@ -21,6 +22,8 @@ interface BetAdvisorModalProps {
   isSkipRecommended: boolean;
   activePatternName: string | null;
   confidence: number;
+  oppNumber?: number;
+  favNumber?: number;
 }
 
 export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
@@ -31,6 +34,8 @@ export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
   isSkipRecommended,
   activePatternName,
   confidence,
+  oppNumber = 2,
+  favNumber = 7,
 }) => {
   const [walletAmount, setWalletAmount] = useState<number>(1000);
   const [inputStr, setInputStr] = useState<string>('1000');
@@ -54,30 +59,45 @@ export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
     }
   }
 
-  // Calculate 6 stages tailored to the entered wallet amount
-  // Safe base bet is ~1.5% to 2% of bankroll (minimum ₹10)
+  // Calculate base unit tailored to wallet amount (~1.5% to 2% of bankroll)
   const baseUnit = Math.max(10, Math.floor((walletAmount * 0.015) / 10) * 10 || 10);
-  
-  // 6-stage progressive recovery amounts
+
+  // 6-stage progressive recovery amounts with Level-Maintained Opposite Number Hedge
   const stages = [
-    { stage: 1, mult: 1, bet: baseUnit, label: 'STAGE 1 (INITIAL)' },
-    { stage: 2, mult: 2.2, bet: Math.max(20, Math.round(baseUnit * 2.2)), label: 'STAGE 2 (IF LOSS 1)' },
-    { stage: 3, mult: 5, bet: Math.max(50, Math.round(baseUnit * 5)), label: 'STAGE 3 (IF LOSS 2)' },
-    { stage: 4, mult: 11, bet: Math.max(110, Math.round(baseUnit * 11)), label: 'STAGE 4 (IF LOSS 3)' },
-    { stage: 5, mult: 25, bet: Math.max(250, Math.round(baseUnit * 25)), label: 'STAGE 5 (IF LOSS 4)' },
-    { stage: 6, mult: 55, bet: Math.max(550, Math.round(baseUnit * 55)), label: 'STAGE 6 (IF LOSS 5)' },
+    { stage: 1, mult: 1.0, oppMult: 0.5, label: 'LEVEL 1 (ENTRY)' },
+    { stage: 2, mult: 2.2, oppMult: 0.5, label: 'LEVEL 2 (RECOVER 1)' },
+    { stage: 3, mult: 5.0, oppMult: 1.0, label: 'LEVEL 3 (RECOVER 2)' },
+    { stage: 4, mult: 11.0, oppMult: 1.5, label: 'LEVEL 4 (RECOVER 3)' },
+    { stage: 5, mult: 24.0, oppMult: 2.5, label: 'LEVEL 5 (RECOVER 4)' },
+    { stage: 6, mult: 52.0, oppMult: 5.0, label: 'LEVEL 6 (MAX GUARD)' },
   ];
 
   let cumulativeCost = 0;
   const stageData = stages.map((s) => {
-    cumulativeCost += s.bet;
-    const payout = Math.round(s.bet * 1.96);
-    const netProfit = payout - cumulativeCost;
+    const mainBet = Math.max(10, Math.round((baseUnit * s.mult) / 10) * 10);
+    // Opposite number hedge bet (pays 9x)
+    const oppBet = Math.max(10, Math.round((baseUnit * s.oppMult) / 10) * 10);
+    const roundTotal = mainBet + oppBet;
+    cumulativeCost += roundTotal;
+
+    // If main bet wins: 1.96x on mainBet
+    const mainPayout = Math.round(mainBet * 1.96);
+    const mainNetProfit = mainPayout - cumulativeCost;
+
+    // If opposite number 9x jackpot hits: 9.0x on oppBet
+    const jackpotPayout = Math.round(oppBet * 9.0);
+    const jackpotNetProfit = jackpotPayout - cumulativeCost;
+
     return {
       ...s,
+      mainBet,
+      oppBet,
+      roundTotal,
       cumulativeCost,
-      payout,
-      netProfit,
+      mainPayout,
+      mainNetProfit,
+      jackpotPayout,
+      jackpotNetProfit,
     };
   });
 
@@ -87,12 +107,15 @@ export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
         {/* Header */}
         <div className="px-4 py-3 border-b border-slate-800 bg-[#060a14]/90 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300">
-              <Coins className="w-4 h-4" />
-            </div>
+            <CasinoHostessAvatar
+              variant="advisor"
+              size="sm"
+              glowColor="amber"
+              showBadge={true}
+            />
             <div>
               <span className="font-['Orbitron'] font-black text-xs sm:text-sm text-white tracking-wider uppercase block">
-                BETTING ADVISOR
+                V3 BETTING ADVISOR
               </span>
               <span className="text-[9px] font-['Orbitron'] font-bold text-cyan-400 uppercase tracking-widest block">
                 MONEY & TIMING GUIDE
@@ -191,14 +214,20 @@ export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>RIGHT NOW: TIME TO BET!</span>
                   </div>
-                  <div className="text-xs font-['Orbitron'] font-black text-white mt-1 uppercase flex items-center justify-center gap-1.5">
-                    <span>TARGET:</span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500 text-black">
-                      {predictedSize}
+                  <div className="text-xs font-['Orbitron'] font-black text-white mt-1 uppercase flex items-center justify-center gap-2 flex-wrap">
+                    <span className="flex items-center gap-1">
+                      <span className="text-slate-400">MAIN ({predictedSize}):</span>
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500 text-black font-black">
+                        ₹{stageData[0]?.mainBet}
+                      </span>
                     </span>
-                    <span className="text-slate-400">|</span>
-                    <span>AMOUNT:</span>
-                    <span className="text-amber-300 font-extrabold">₹{stageData[0]?.bet}</span>
+                    <span className="text-slate-400">·</span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-cyan-300">OPP (⚡{oppNumber}):</span>
+                      <span className="px-1.5 py-0.5 rounded bg-cyan-500 text-black font-black">
+                        ₹{stageData[0]?.oppBet}
+                      </span>
+                    </span>
                   </div>
                 </div>
               )}
@@ -209,40 +238,59 @@ export const BetAdvisorModal: React.FC<BetAdvisorModalProps> = ({
             </div>
           </div>
 
-          {/* STEP 3: Stage-wise Bet Amounts (Kitna Kitna Bet Karna Hai) */}
+          {/* STEP 3: Stage-wise Bet Amounts with Opposite Number Hedge */}
           <div className="p-3 rounded-2xl bg-slate-900/90 border border-slate-800">
             <div className="text-[10px] font-['Orbitron'] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
               <span className="flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>KITNA KA BET KARNA HAI (6 LEVELS)</span>
+                <span>6-LEVEL PLAN: MAIN + OPPOSITE 9X HEDGE</span>
               </span>
-              <span className="text-emerald-400 font-black">1.96X PROFIT</span>
+              <span className="text-emerald-400 font-black">9X JACKPOT</span>
+            </div>
+
+            {/* Column Header */}
+            <div className="grid grid-cols-12 gap-1 text-[8px] font-['Orbitron'] font-bold text-slate-400 px-1 mb-1.5 uppercase tracking-wider">
+              <div className="col-span-3">LEVEL</div>
+              <div className="col-span-3 text-center">MAIN ({predictedSize})</div>
+              <div className="col-span-3 text-center text-cyan-300">OPP (⚡{oppNumber})</div>
+              <div className="col-span-3 text-right text-emerald-400">9X PROFIT</div>
             </div>
 
             <div className="space-y-1.5 font-['Orbitron']">
-              {stageData.slice(0, 5).map((s) => (
+              {stageData.map((s) => (
                 <div
                   key={s.stage}
-                  className={`p-2 rounded-xl border flex items-center justify-between text-[10px] ${
+                  className={`p-2 rounded-xl border grid grid-cols-12 gap-1 items-center text-[10px] ${
                     s.stage === 1
-                      ? 'bg-emerald-950/50 border-emerald-500/60 text-emerald-200'
+                      ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200'
                       : 'bg-slate-950 border-slate-800 text-slate-300'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-slate-800 text-[9px] font-black flex items-center justify-center text-cyan-300">
-                      {s.stage}
+                  <div className="col-span-3 flex items-center gap-1">
+                    <span className="w-4 h-4 rounded-full bg-slate-800 text-[8px] font-black flex items-center justify-center text-cyan-300 shrink-0">
+                      L{s.stage}
                     </span>
-                    <span className="font-bold uppercase tracking-wider">{s.label}</span>
+                    <span className="font-bold text-[9px] uppercase truncate">LVL {s.stage}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-amber-300 text-xs">₹{s.bet}</span>
-                    <span className="text-[8px] text-emerald-400 font-bold">
-                      +{s.netProfit > 0 ? `₹${s.netProfit}` : 'RECOVER'}
-                    </span>
+
+                  <div className="col-span-3 text-center font-black text-amber-300 text-[10px]">
+                    ₹{s.mainBet}
+                  </div>
+
+                  <div className="col-span-3 text-center font-black text-cyan-300 text-[10px]">
+                    ₹{s.oppBet}
+                  </div>
+
+                  <div className="col-span-3 text-right font-black text-[9px] text-emerald-400">
+                    +₹{s.jackpotNetProfit}
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-2.5 p-2 rounded-xl bg-cyan-950/30 border border-cyan-500/30 text-[9px] font-['Orbitron'] text-cyan-300 flex items-center justify-between">
+              <span>⚡ OPPOSITE BALL HEDGE:</span>
+              <span className="font-bold">PAYS 9X ON HIT · LEVEL MAINTAINED</span>
             </div>
           </div>
 

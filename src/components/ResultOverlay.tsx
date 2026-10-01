@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { OutcomeType, SizeType } from '../types';
 import { WinGoBall } from './WinGoBall';
 import { LogoEmblem } from './LogoEmblem';
+import { CasinoHostessAvatar } from './CasinoHostessAvatar';
 import { ChevronRight, X, Flame, Sparkles } from 'lucide-react';
 
 interface ResultOverlayProps {
@@ -37,16 +38,26 @@ export const ResultOverlay: React.FC<ResultOverlayProps> = ({
 
   return (
     <div className="fixed inset-0 z-[700] flex items-center justify-center p-3 bg-black/80 backdrop-blur-md animate-fadeIn">
+      {/* High-Energy Victory Laser Background Halo */}
+      {isWin && (
+        <div className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-amber-500/20 blur-3xl pointer-events-none animate-pulse" />
+      )}
+
       {/* Main Compact Popup Card */}
       <div
-        className={`relative w-full max-w-xs sm:max-w-sm rounded-2xl p-4 sm:p-5 text-center overflow-hidden border-2 animate-popBounce ${
+        className={`relative w-full max-w-xs sm:max-w-sm rounded-2xl p-4 sm:p-5 text-center overflow-hidden border-2 ${
+          isWin ? 'animate-victoryBurst' : 'animate-popBounce'
+        } ${
           isJackpot
-            ? 'bg-gradient-to-b from-[#1c1335] via-[#100b24] to-[#080512] border-amber-400 shadow-[0_0_40px_rgba(255,183,3,0.5)]'
+            ? 'bg-gradient-to-b from-[#1c1335] via-[#100b24] to-[#080512] border-amber-400 shadow-[0_0_50px_rgba(255,183,3,0.6)]'
             : isWin
-            ? 'bg-gradient-to-b from-[#0e2424] via-[#08181a] to-[#040d0e] border-emerald-400 shadow-[0_0_35px_rgba(16,185,129,0.45)]'
+            ? 'bg-gradient-to-b from-[#0e2424] via-[#08181a] to-[#040d0e] border-emerald-400 shadow-[0_0_45px_rgba(16,185,129,0.55)]'
             : 'bg-gradient-to-b from-[#240e15] via-[#18080d] to-[#0e0407] border-rose-500 shadow-[0_0_35px_rgba(244,63,94,0.45)]'
         }`}
       >
+        {isWin && (
+          <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none animate-raysSpin" />
+        )}
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -55,9 +66,15 @@ export const ResultOverlay: React.FC<ResultOverlayProps> = ({
           <X className="w-3.5 h-3.5" />
         </button>
 
-        {/* Top Logo Emblem */}
-        <div className="flex justify-center mb-1">
+        {/* Top Logo Emblem & Celebration Hostess */}
+        <div className="flex justify-center items-center gap-2 mb-2">
           <LogoEmblem size="sm" glow={true} />
+          <CasinoHostessAvatar
+            variant={isWin ? "winner" : "concierge"}
+            size="sm"
+            glowColor={isJackpot ? "amber" : isWin ? "emerald" : "rose"}
+            speechBubble={isJackpot ? "9X HIT!" : isWin ? "ROUND WON!" : "RECOVERING"}
+          />
         </div>
 
         {/* Hero Title & Outcome Icon: Compact, uppercase */}
@@ -100,6 +117,14 @@ export const ResultOverlay: React.FC<ResultOverlayProps> = ({
             <span>WINNING CASINO BALL</span>
           </span>
           <WinGoBall number={actualNumber} size="xl" showBadge={true} highlight={true} animate={false} />
+          <div className="mt-2 flex items-center gap-1.5 text-[9px] font-['Orbitron'] font-black uppercase">
+            <span className={`px-2 py-0.5 rounded ${actualNumber >= 5 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'}`}>
+              {actualNumber >= 5 ? 'BIG' : 'SMALL'}
+            </span>
+            <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">
+              {actualNumber % 2 !== 0 ? 'ODD' : 'EVEN'}
+            </span>
+          </div>
         </div>
 
         {/* Round Snapshot Grid: Compact single line entries */}

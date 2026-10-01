@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LogoEmblem } from './LogoEmblem';
+import { CasinoHostessAvatar } from './CasinoHostessAvatar';
 import { KeyLicense } from '../types';
 import { playClickSound, playLockSound } from '../utils/sound';
 import { Key, ShieldAlert, CheckCircle2, Lock, Copy, X, Sparkles, Clock, Trash2 } from 'lucide-react';
@@ -223,17 +224,25 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, isLocked }) =>
           isShaking ? 'animate-[shake_0.4s_ease-in-out]' : ''
         }`}
       >
-        {/* Emblem Logo */}
-        <div className="mb-4 flex justify-center">
-          <LogoEmblem size="lg" glow={true} />
+        {/* Emblem & Hostess Concierge Avatar */}
+        <div className="mb-4 flex flex-col items-center justify-center gap-2">
+          <div className="flex items-center gap-3">
+            <LogoEmblem size="md" glow={true} />
+            <CasinoHostessAvatar
+              variant="concierge"
+              size="md"
+              glowColor="cyan"
+              speechBubble="WELCOME TO V3"
+            />
+          </div>
         </div>
 
         {/* Title */}
         <h1 className="text-xl sm:text-2xl font-black font-['Orbitron'] tracking-wider bg-gradient-to-r from-cyan-400 via-sky-300 to-rose-400 bg-clip-text text-transparent">
-          亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪ𝗩ɪ𝗢ɴ 亗 𝗩𝟮 亗
+          亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗 𝗩𝟯 亗
         </h1>
         <p className="text-[11px] font-bold text-slate-400 tracking-widest mt-1 uppercase">
-          Predict Play and Win · Neural Casino Engine
+          Predict Play and Win · V3 Quantum Casino Engine
         </p>
 
         {/* Status Prompt */}

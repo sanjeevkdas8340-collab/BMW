@@ -3,14 +3,16 @@ import { PredictionRecord } from '../types';
 import { SEED_NUMBERS, getBallColor, getBallSize } from '../data/seedData';
 import { Trophy, Flame, Gem, Skull, BarChart3, TrendingUp, Award, ShieldCheck, Activity, Zap, PieChart, Sparkles } from 'lucide-react';
 import { WinGoBall } from './WinGoBall';
+import { CasinoHostessAvatar } from './CasinoHostessAvatar';
 import { playClickSound } from '../utils/sound';
 
 interface StatsViewProps {
   records: PredictionRecord[];
   bestStreak: number;
+  recentNumbers?: number[];
 }
 
-export const StatsView: React.FC<StatsViewProps> = ({ records, bestStreak }) => {
+export const StatsView: React.FC<StatsViewProps> = ({ records, bestStreak, recentNumbers }) => {
   const [activeTab, setActiveTab] = useState<'session' | 'archive'>('session');
 
   // Session stats
@@ -117,9 +119,9 @@ export const StatsView: React.FC<StatsViewProps> = ({ records, bestStreak }) => 
           <div className="rounded-3xl p-5 bg-gradient-to-b from-[#0f172a] to-[#070b16] border border-cyan-500/40 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-cyan-400" />
+                <CasinoHostessAvatar size="xs" variant="concierge" glowColor="cyan" showBadge={false} />
                 <span className="font-['Orbitron'] font-black text-xs text-white tracking-wider uppercase">
-                  PERFORMANCE OVERVIEW
+                  V3 PERFORMANCE OVERVIEW
                 </span>
               </div>
               <span className="text-[10px] font-bold text-slate-400">
@@ -148,7 +150,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ records, bestStreak }) => 
             <div className="p-3 rounded-2xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between text-xs">
               <span className="font-semibold text-slate-300 flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-emerald-400" />
-                <span>2-Level Verified Accuracy:</span>
+                <span>V3 Quantum Verified Accuracy:</span>
               </span>
               <span className="font-['Orbitron'] font-black text-emerald-400">
                 {verifiedRate}% ({verifiedWins}/{verifiedRecords.length})
@@ -197,6 +199,84 @@ export const StatsView: React.FC<StatsViewProps> = ({ records, bestStreak }) => 
 
       {activeTab === 'archive' && (
         <div className="space-y-4">
+          {/* LIVE LAST 10 ROUNDS FLOW - PROMINENTLY SHOWING WHAT IS COMING */}
+          <div className="rounded-3xl p-4 bg-gradient-to-b from-[#13112c] via-[#0d0c20] to-[#060614] border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(0,229,255,0.25)]">
+            <div className="flex items-center justify-between pb-2.5 border-b border-purple-900/40">
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-cyan-400" />
+                <div>
+                  <span className="font-['Orbitron'] font-black text-xs text-white tracking-wider uppercase block">
+                    LAST 10 LIVE ROUNDS FLOW
+                  </span>
+                  <span className="text-[8px] font-['Orbitron'] font-bold text-cyan-300 uppercase tracking-widest block">
+                    LIVE BALL SEQUENCE · RECENT RESULTS
+                  </span>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-black bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 uppercase">
+                10 ROUNDS
+              </span>
+            </div>
+
+            {/* Horizontal Flow Strip of 10 Results */}
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 my-3">
+              {(recentNumbers && recentNumbers.length >= 10 ? recentNumbers : SEED_NUMBERS).slice(0, 10).map((num, idx) => {
+                const size = getBallSize(num);
+                const isOdd = num % 2 !== 0;
+
+                return (
+                  <div
+                    key={idx}
+                    className={`flex flex-col items-center justify-between p-1.5 rounded-xl border text-center transition-all ${
+                      idx === 0
+                        ? 'bg-cyan-950/70 border-cyan-400 shadow-[0_0_12px_rgba(0,229,255,0.4)] ring-1 ring-cyan-400'
+                        : 'bg-slate-900/80 border-slate-800'
+                    }`}
+                  >
+                    <span className="text-[8px] font-['Orbitron'] font-black text-slate-400 mb-1">
+                      {idx === 0 ? 'LATEST' : `#${idx + 1}`}
+                    </span>
+                    <WinGoBall number={num} size="sm" showBadge={false} highlight={idx === 0} animate={idx === 0} />
+                    <span
+                      className={`mt-1.5 text-[8px] font-['Orbitron'] font-black px-1 py-0.2 rounded uppercase ${
+                        size === 'BIG'
+                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                          : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                      }`}
+                    >
+                      {size}
+                    </span>
+                    <span className="text-[7px] font-['Orbitron'] font-bold text-slate-400 mt-0.5 uppercase">
+                      {isOdd ? 'ODD' : 'EVEN'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Quick Summary of Last 10 */}
+            <div className="grid grid-cols-3 gap-2 p-2 rounded-xl bg-slate-950/70 border border-slate-800/80 text-center text-[9px] font-['Orbitron'] font-bold">
+              <div>
+                <span className="text-slate-400 block text-[8px]">BIG IN LAST 10</span>
+                <span className="text-rose-400 font-black text-xs">
+                  {(recentNumbers && recentNumbers.length >= 10 ? recentNumbers : SEED_NUMBERS).slice(0, 10).filter(n => getBallSize(n) === 'BIG').length} / 10
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[8px]">SMALL IN LAST 10</span>
+                <span className="text-cyan-400 font-black text-xs">
+                  {(recentNumbers && recentNumbers.length >= 10 ? recentNumbers : SEED_NUMBERS).slice(0, 10).filter(n => getBallSize(n) === 'SMALL').length} / 10
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[8px]">ACTIVE CADENCE</span>
+                <span className="text-amber-300 font-black text-xs">
+                  {getBallSize((recentNumbers && recentNumbers.length >= 10 ? recentNumbers : SEED_NUMBERS)[0])} MOMENTUM
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* 1000-Round Distribution Card */}
           <div className="rounded-3xl p-5 bg-gradient-to-b from-[#13112c] via-[#0d0c20] to-[#060614] border-2 border-purple-500/40 shadow-xl">
             <div className="flex items-center justify-between pb-3 border-b border-purple-900/40">

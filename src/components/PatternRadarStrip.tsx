@@ -164,7 +164,10 @@ export const PatternRadarStrip: React.FC<PatternRadarStripProps> = ({
   }
 
   return (
-    <div className="rounded-3xl p-3.5 bg-gradient-to-b from-[#0c1424] to-[#060a14] border border-cyan-500/30 shadow-lg">
+    <div className="relative rounded-3xl p-3.5 bg-gradient-to-b from-[#0c1424] to-[#060a14] border border-cyan-500/30 shadow-lg overflow-hidden">
+      {/* Animated Radar Laser Beam */}
+      <div className="absolute left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent pointer-events-none animate-laserSweep opacity-60" />
+
       <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 mb-2.5">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />

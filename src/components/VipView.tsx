@@ -1,6 +1,6 @@
 import React from 'react';
-import { Crown, ShieldCheck, Zap, Sparkles, Gem, ArrowRight, ExternalLink, CheckCircle2, Lock } from 'lucide-react';
-import { LogoEmblem } from './LogoEmblem';
+import { Crown, ShieldCheck, Zap, Sparkles, Gem, ArrowRight, Lock } from 'lucide-react';
+import { CasinoHostessAvatar } from './CasinoHostessAvatar';
 import { playClickSound } from '../utils/sound';
 
 interface VipViewProps {
@@ -22,10 +22,10 @@ export const VipView: React.FC<VipViewProps> = ({ onOpenBetAdvisor, onLockApp })
             </div>
             <div>
               <span className="font-['Orbitron'] font-black text-sm text-amber-300 tracking-wider uppercase block">
-                BMW VIP CLUB
+                亗 𝗕ᴍᴡ 亗 VIP SUITE V3
               </span>
               <span className="text-[9px] font-['Orbitron'] font-bold text-amber-400/80 uppercase tracking-widest block">
-                ELITE ACCESS TIER
+                ELITE CASINO TIER
               </span>
             </div>
           </div>
@@ -36,23 +36,23 @@ export const VipView: React.FC<VipViewProps> = ({ onOpenBetAdvisor, onLockApp })
           </span>
         </div>
 
-        {/* Member Status Badge */}
-        <div className="my-3.5 p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center justify-between">
-          <div>
-            <span className="text-[9px] font-['Orbitron'] font-bold text-amber-400 uppercase tracking-wider block">
-              VIP ACCOUNT STATUS
-            </span>
-            <span className="text-xs font-['Orbitron'] font-black text-white uppercase tracking-wider">
-              PRIME LIFETIME PASS
-            </span>
+        {/* Casino VIP Hostess Spotlight */}
+        <div className="my-3.5 p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <CasinoHostessAvatar
+              variant="hostess"
+              size="md"
+              glowColor="amber"
+              speechBubble="WELCOME TO VIP LOUNGE"
+            />
           </div>
           <div className="text-right">
             <span className="text-[9px] font-['Orbitron'] font-bold text-slate-400 uppercase tracking-wider block">
-              SECURITY PROTOCOL
+              V3 NEURAL ENGINE
             </span>
-            <span className="text-xs font-['Orbitron'] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+            <span className="text-xs font-['Orbitron'] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1 justify-end">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>UNLOCKED</span>
+              <span>ACTIVE 99.4%</span>
             </span>
           </div>
         </div>
@@ -70,9 +70,9 @@ export const VipView: React.FC<VipViewProps> = ({ onOpenBetAdvisor, onLockApp })
           <div className="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between text-slate-200">
             <span className="flex items-center gap-2">
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-              <span className="font-bold uppercase tracking-wider">ANTI-TRAP AUTO PROTECTION</span>
+              <span className="font-bold uppercase tracking-wider">LEVEL 1-2 CAPPING DEFENSE</span>
             </span>
-            <span className="text-emerald-400 font-black">ACTIVE</span>
+            <span className="text-emerald-400 font-black">MAX L1-L2</span>
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between text-slate-200">

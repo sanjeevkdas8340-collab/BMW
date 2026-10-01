@@ -2,7 +2,7 @@ import React from 'react';
 import { SizeType } from '../types';
 import { WinGoBall } from './WinGoBall';
 import { DualLevelPrediction } from '../utils/patternEngine';
-import { Sparkles, Copy, ShieldCheck, Flame, Zap, Check, Lock, AlertTriangle, Calculator } from 'lucide-react';
+import { Sparkles, Copy, ShieldCheck, Flame, Zap, Check, Lock, AlertTriangle, Calculator, Layers } from 'lucide-react';
 import { playClickSound, playLockSound } from '../utils/sound';
 
 interface PredictionCardProps {
@@ -40,11 +40,18 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
     skipReason,
     transferDescription,
     recommendedUnit,
+    currentLevel,
+    levelMultiplier,
+    levelDefenseStatus,
+    markovProb,
   } = prediction;
   const isBig = predictedSize === 'BIG';
 
   return (
     <div className="relative rounded-2xl p-4 sm:p-5 bg-gradient-to-b from-[#0f172a] via-[#090e1c] to-[#050813] border border-cyan-500/40 shadow-[0_8px_30px_rgba(0,0,0,0.6),0_0_20px_rgba(0,229,255,0.15)] overflow-hidden">
+      {/* High-Power Cyber Laser Scanner Sweep */}
+      <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent pointer-events-none animate-laserSweep opacity-80 z-10" />
+
       {/* Background Soft Glow Highlights */}
       <div className="absolute -top-12 -left-12 w-32 h-32 rounded-full bg-cyan-500/15 blur-2xl pointer-events-none" />
       <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-rose-600/15 blur-2xl pointer-events-none" />
@@ -54,24 +61,32 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
         <div className="flex items-center gap-1.5 overflow-hidden">
           <span className="px-2 py-0.5 rounded-lg text-[9px] font-['Orbitron'] font-black tracking-wider uppercase bg-gradient-to-r from-cyan-500 to-blue-600 text-white flex items-center gap-1 shrink-0">
             <Sparkles className="w-2.5 h-2.5 text-cyan-200" />
-            <span>PRIME V2</span>
+            <span>QUANTUM V3</span>
           </span>
           <span className="text-[9px] font-['Orbitron'] font-bold text-cyan-300 uppercase truncate">
             {regime.icon} {regime.name}
           </span>
         </div>
 
-        {/* 2-Level Verified Badge */}
-        {isTwoLevelVerified ? (
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-black tracking-wider uppercase bg-emerald-950/90 border border-emerald-400/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)] flex items-center gap-1 shrink-0">
-            <ShieldCheck className="w-3 h-3 text-emerald-400" />
-            <span>100% VERIFIED</span>
-          </span>
-        ) : (
-          <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-bold tracking-wider uppercase bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 shrink-0">
-            L1 ACTIVE
-          </span>
-        )}
+        {/* Martingale Level Indicator (Cap Defense) */}
+        <div className="flex items-center gap-1">
+          {currentLevel === 1 ? (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-black tracking-wider uppercase bg-emerald-950/90 border border-emerald-400/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)] flex items-center gap-1 shrink-0">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span>LEVEL 1 (1X)</span>
+            </span>
+          ) : currentLevel === 2 ? (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-black tracking-wider uppercase bg-amber-950/90 border border-amber-400/80 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)] animate-pulse flex items-center gap-1 shrink-0">
+              <AlertTriangle className="w-3 h-3 text-amber-400" />
+              <span>LEVEL 2 (3X RECOVERY)</span>
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-['Orbitron'] font-black tracking-wider uppercase bg-rose-950/90 border border-rose-400/80 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.5)] animate-pulse flex items-center gap-1 shrink-0">
+              <AlertTriangle className="w-3 h-3 text-rose-400" />
+              <span>LEVEL {currentLevel} (SHIELD)</span>
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Hero Prediction */}
@@ -149,35 +164,97 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
       {/* Casino WinGo Balls Display: Favor Ball & Opposite Ball (Compact, sleek) */}
       <div className="grid grid-cols-2 gap-2.5 my-2.5">
         {/* Favor Number Card */}
-        <div className="relative p-2.5 rounded-xl bg-[#0b1220] border border-emerald-500/40 text-center flex flex-col items-center justify-center">
-          <div className="text-[9px] font-['Orbitron'] font-black tracking-wider text-emerald-400 uppercase flex items-center gap-1 mb-1.5 whitespace-nowrap">
-            <Flame className="w-3 h-3 text-emerald-400" />
+        <div className="relative p-2.5 rounded-xl bg-[#0b1220] border border-emerald-500/50 text-center flex flex-col items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+          <div className="absolute inset-0 rounded-xl pointer-events-none animate-quantumShockwave opacity-40" />
+          <div className="text-[9px] font-['Orbitron'] font-black tracking-wider text-emerald-400 uppercase flex items-center gap-1 mb-1.5 whitespace-nowrap z-10">
+            <Flame className="w-3 h-3 text-emerald-400 animate-pulse" />
             <span>FAVOR BALL</span>
           </div>
 
-          <div className="my-0.5">
+          <div className="my-0.5 z-10">
             <WinGoBall number={favNumber} size="md" showBadge={true} highlight={true} animate={true} />
           </div>
 
-          <span className="text-[8px] font-['Orbitron'] font-bold text-slate-400 uppercase mt-1 whitespace-nowrap">
+          <span className="text-[8px] font-['Orbitron'] font-bold text-slate-400 uppercase mt-1 whitespace-nowrap z-10">
             PRIMARY ({isBig ? 'BIG' : 'SMALL'})
           </span>
         </div>
 
         {/* Opposite Number Card (Jackpot Hedge) */}
-        <div className="relative p-2.5 rounded-xl bg-[#0b1220] border border-cyan-500/40 text-center flex flex-col items-center justify-center">
-          <div className="text-[9px] font-['Orbitron'] font-black tracking-wider text-cyan-400 uppercase flex items-center gap-1 mb-1.5 whitespace-nowrap">
-            <Zap className="w-3 h-3 text-cyan-400" />
+        <div className="relative p-2.5 rounded-xl bg-[#0b1220] border border-cyan-500/50 text-center flex flex-col items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,229,255,0.2)]">
+          <div className="absolute inset-0 rounded-xl pointer-events-none animate-quantumShockwave opacity-40" />
+          <div className="text-[9px] font-['Orbitron'] font-black tracking-wider text-cyan-400 uppercase flex items-center gap-1 mb-1.5 whitespace-nowrap z-10">
+            <Zap className="w-3 h-3 text-cyan-400 animate-pulse" />
             <span>OPPOSITE (9X)</span>
           </div>
 
-          <div className="my-0.5">
+          <div className="my-0.5 z-10">
             <WinGoBall number={oppNumber} size="md" showBadge={true} highlight={false} animate={true} />
           </div>
 
-          <span className="text-[8px] font-['Orbitron'] font-bold text-slate-400 uppercase mt-1 whitespace-nowrap">
+          <span className="text-[8px] font-['Orbitron'] font-bold text-slate-400 uppercase mt-1 whitespace-nowrap z-10">
             JACKPOT ({isBig ? 'SMALL' : 'BIG'})
           </span>
+        </div>
+      </div>
+
+      {/* Deep Pattern Analysis (DP Engine) Module */}
+      {prediction.deepAnalysis && (
+        <div className="my-2 p-2 rounded-xl bg-slate-950/80 border border-cyan-500/30 text-[9px] font-['Orbitron'] space-y-1">
+          <div className="flex items-center justify-between text-slate-300 font-bold border-b border-slate-800 pb-1">
+            <span className="flex items-center gap-1 text-cyan-300 font-black">
+              <span>🔬 DP ANALYSIS:</span>
+              <span className="text-white truncate max-w-[140px]">{prediction.deepAnalysis.patternType}</span>
+            </span>
+            <span className="text-emerald-400 font-black text-[8px] shrink-0">
+              {prediction.deepAnalysis.currentStage}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1 text-[8px] text-slate-400 pt-0.5">
+            <div>
+              <span className="text-slate-500">PARITY: </span>
+              <span className="text-white font-bold">{prediction.deepAnalysis.harmonicParity.replace('_', ' ')}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-slate-500">ENTROPY: </span>
+              <span className={prediction.deepAnalysis.transitionEntropy > 60 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+                {prediction.deepAnalysis.transitionEntropy}% {prediction.deepAnalysis.transitionEntropy > 60 ? '(HIGH)' : '(STABLE)'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Level-2 Capping Defense & Markov Engine Protocol */}
+      <div className="my-2 p-2.5 rounded-xl bg-gradient-to-r from-[#07101f] via-slate-950 to-[#0c0d1c] border border-cyan-500/40 text-[9px] font-['Orbitron'] space-y-1.5 shadow-[0_0_15px_rgba(0,229,255,0.15)]">
+        <div className="flex items-center justify-between text-slate-300 font-bold border-b border-slate-800/80 pb-1">
+          <span className="flex items-center gap-1.5 text-cyan-400 font-black">
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
+            <span>LEVEL DEFENSE PROTOCOL</span>
+          </span>
+          <span className={`px-2 py-0.2 rounded font-black text-[8px] ${
+            currentLevel === 1 
+              ? 'bg-emerald-950 border border-emerald-500/50 text-emerald-400' 
+              : 'bg-amber-950 border border-amber-500/80 text-amber-300 animate-pulse'
+          }`}>
+            {levelDefenseStatus}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 text-[8px] pt-0.5">
+          <div className="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+            <span className="text-slate-400">MARKOV (O3):</span>
+            <span className="text-cyan-300 font-black">
+              B {markovProb?.bigPct || 50}% · S {markovProb?.smallPct || 50}%
+            </span>
+          </div>
+          <div className="flex items-center justify-between bg-slate-900/80 px-2 py-1 rounded-lg border border-slate-800">
+            <span className="text-slate-400">MAX LEVEL:</span>
+            <span className="text-emerald-400 font-black">
+              L1-L2 CAP (NO L4)
+            </span>
+          </div>
         </div>
       </div>
 

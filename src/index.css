@@ -87,9 +87,120 @@
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes cyberLaserSweep {
+    0% {
+      top: -10%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      top: 110%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes quantumShockwave {
+    0% {
+      transform: scale(0.9);
+      opacity: 0.9;
+      box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7);
+    }
+    70% {
+      transform: scale(1.15);
+      opacity: 0.4;
+      box-shadow: 0 0 0 16px rgba(0, 229, 255, 0);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+      box-shadow: 0 0 0 0 rgba(0, 229, 255, 0);
+    }
+  }
+
+  @keyframes cyberFloat {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-6px) rotate(1deg);
+    }
+  }
+
+  @keyframes neonGlowPulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.6)) drop-shadow(0 0 20px rgba(0, 229, 255, 0.3));
+    }
+    50% {
+      filter: drop-shadow(0 0 16px rgba(244, 63, 94, 0.8)) drop-shadow(0 0 35px rgba(244, 63, 94, 0.5));
+    }
+  }
+
+  @keyframes ballSpinHigh {
+    0% {
+      transform: rotate(0deg) scale(0.7);
+      opacity: 0;
+    }
+    60% {
+      transform: rotate(380deg) scale(1.08);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes victoryBurst {
+    0% {
+      transform: scale(0.4) rotate(-10deg);
+      opacity: 0;
+      filter: brightness(2);
+    }
+    60% {
+      transform: scale(1.12) rotate(3deg);
+      opacity: 1;
+      filter: brightness(1.2);
+    }
+    80% {
+      transform: scale(0.97) rotate(-1deg);
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+      filter: brightness(1);
+    }
+  }
 }
 
 /* Custom Animation Utility Classes */
+.animate-laserSweep {
+  animation: cyberLaserSweep 3.2s ease-in-out infinite;
+}
+
+.animate-quantumShockwave {
+  animation: quantumShockwave 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.animate-cyberFloat {
+  animation: cyberFloat 4s ease-in-out infinite;
+}
+
+.animate-neonGlowPulse {
+  animation: neonGlowPulse 2.5s ease-in-out infinite;
+}
+
+.animate-ballSpinHigh {
+  animation: ballSpinHigh 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-victoryBurst {
+  animation: victoryBurst 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
 .animate-popBounce {
   animation: popBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }

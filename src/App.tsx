@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { SizeType, OutcomeType, PredictionRecord, WinGoResultItem } from './types';
 import { SEED_NUMBERS, getBallSize } from './data/seedData';
 import {
@@ -18,6 +18,7 @@ import { LockScreen } from './components/LockScreen';
 import { PatternRadarStrip } from './components/PatternRadarStrip';
 import { BetAdvisorModal } from './components/BetAdvisorModal';
 import { VipView } from './components/VipView';
+import { CasinoHostessAvatar } from './components/CasinoHostessAvatar';
 import {
   Home,
   History as HistoryIcon,
@@ -123,6 +124,20 @@ export default function App() {
   const predictionRef = useRef<DualLevelPrediction>(prediction);
   const lastResolvedPeriodRef = useRef<string>('');
 
+  // Live Martingale Level Calculator (Resets to 1 immediately on Win or Jackpot)
+  const currentMartingaleLevel = useMemo(() => {
+    let lossCount = 0;
+    for (const r of records) {
+      if (r.result === null) continue; // skip pending
+      if (r.result === 'win' || r.result === 'jackpot') {
+        break; // win or jackpot resets level immediately to 1!
+      } else if (r.result === 'loss') {
+        lossCount++;
+      }
+    }
+    return Math.min(4, lossCount + 1);
+  }, [records]);
+
   // Permanent immutable registry of predictions made for each round.
   // Once a prediction is made for a round, it can NEVER be changed or rewritten.
   const lockedPredictionsMapRef = useRef<
@@ -182,10 +197,10 @@ export default function App() {
   const refreshPrediction = useCallback((nums: number[]) => {
     const lastFav = predictionRef.current?.favNumber;
     const lastOpp = predictionRef.current?.oppNumber;
-    const newPred = generateDualLevelPrediction(nums, lastFav, lastOpp);
+    const newPred = generateDualLevelPrediction(nums, lastFav, lastOpp, currentMartingaleLevel);
     setPrediction(newPred);
     setManualSelectedSize(newPred.predictedSize);
-  }, []);
+  }, [currentMartingaleLevel]);
 
   // Starts and permanently locks the prediction for a new period
   const startNewRound = useCallback(
@@ -194,7 +209,7 @@ export default function App() {
 
       const lastFav = predictionRef.current?.favNumber;
       const lastOpp = predictionRef.current?.oppNumber;
-      const newPred = generateDualLevelPrediction(nums, lastFav, lastOpp);
+      const newPred = generateDualLevelPrediction(nums, lastFav, lastOpp, currentMartingaleLevel);
       setPrediction(newPred);
       setManualSelectedSize(newPred.predictedSize);
       setCurrentPeriod(newPeriod);
@@ -225,6 +240,7 @@ export default function App() {
           sig: newPred.activePattern?.name || null,
           verified: newPred.isTwoLevelVerified,
           demo: isDemoMode,
+          level: currentMartingaleLevel,
           timestamp: Date.now(),
         };
 
@@ -531,13 +547,13 @@ export default function App() {
       : `💰 ${toBoldUnicode('Bet Sizing: 1X UNIT (SAFE BET / CONFIDENT)')}`;
 
     const report =
-      `亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗 𝗩𝟮 亗\n` +
+      `亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗 𝗩𝟯 亗\n` +
       `📅 ${toBoldUnicode(`Period: ${prd}`)} ⏳\n` +
       `🎯 ${toBoldUnicode(`Target: ${sz}`)} (Favor: ${fav} · Opp: ${opp})\n` +
       `⚡ ${toBoldUnicode(`Pattern: ${patName}`)}\n` +
       `${riskLine}\n` +
       `${unitLine}\n` +
-      `🤖 ${toBoldUnicode(`2-Level Neural: ${prediction.isTwoLevelVerified ? '100% VERIFIED ✓' : 'VERIFIED'}`)}\n` +
+      `🤖 ${toBoldUnicode(`V3 Quantum Neural: ${prediction.isTwoLevelVerified ? '100% VERIFIED ✓' : 'VERIFIED'}`)}\n` +
       `${actionLine}`;
 
     if (navigator.clipboard) {
@@ -610,20 +626,20 @@ export default function App() {
       </button>
 
       {/* TOP NAVBAR */}
-      <header className="sticky top-0 z-30 px-3.5 py-2.5 bg-[#060a14]/90 backdrop-blur-xl border-b border-cyan-500/30 flex items-center justify-between gap-2 whitespace-nowrap">
-        <div className="flex items-center gap-2">
-          <LogoEmblem size="nav" glow={true} />
-          <div>
-            <div className="font-['Orbitron'] font-black text-xs sm:text-sm text-white tracking-wider flex items-center gap-1 uppercase">
-              <span>亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-rose-600 text-white font-extrabold">
-                V2
+      <header className="sticky top-0 z-30 px-3 py-2 bg-[#060a14]/90 backdrop-blur-xl border-b border-cyan-500/30 flex items-center justify-between gap-1.5 whitespace-nowrap">
+        <div className="flex items-center gap-1.5 overflow-hidden">
+          <CasinoHostessAvatar size="xs" variant="concierge" showBadge={false} glowColor="cyan" />
+          <div className="truncate">
+            <div className="font-['Orbitron'] font-black text-xs text-white tracking-wider flex items-center gap-1 uppercase truncate">
+              <span className="truncate">亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-gradient-to-r from-cyan-500 to-rose-600 text-white font-extrabold shrink-0">
+                V3
               </span>
             </div>
-            <div className="text-[8px] font-bold text-cyan-400 tracking-widest uppercase flex items-center gap-1.5">
-              <span>PREDICT PLAY & WIN</span>
-              <span className="text-slate-500">|</span>
-              <span className="flex items-center gap-0.5 text-emerald-400">
+            <div className="text-[8px] font-bold text-cyan-400 tracking-widest uppercase flex items-center gap-1 truncate">
+              <span>QUANTUM NEURAL</span>
+              <span className="text-slate-500">·</span>
+              <span className="flex items-center gap-0.5 text-emerald-400 shrink-0">
                 {isApiOnline ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5 text-amber-400" />}
                 {isApiOnline ? 'LIVE API' : 'DEMO MODE'}
               </span>
@@ -632,7 +648,7 @@ export default function App() {
         </div>
 
         {/* Header Right Actions: Audio FX Toggle, Quick Lock Button & 60s Circular Countdown Timer */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={handleToggleSound}
             className="p-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer"
@@ -654,7 +670,7 @@ export default function App() {
           </button>
 
           <div
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl border font-['Orbitron'] font-black text-xs shadow-md transition-all ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-xl border font-['Orbitron'] font-black text-xs shadow-md transition-all ${
               remainingSeconds <= 5
                 ? 'bg-rose-950/80 border-rose-500 text-rose-300 animate-pulse'
                 : 'bg-slate-900/80 border-cyan-500/40 text-cyan-300'
@@ -669,7 +685,7 @@ export default function App() {
       {/* Ticker marquee */}
       <div className="py-1 px-3 bg-gradient-to-r from-blue-950/80 via-slate-900/90 to-rose-950/80 border-b border-slate-800 text-[9px] font-bold text-slate-300 overflow-hidden whitespace-nowrap uppercase">
         <div className="inline-block animate-[tickerMove_22s_linear_infinite]">
-          ⚡ 亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗 𝗩𝟮 亗 · AUTHENTIC 3D CASINO WINGO BALLS · 1000-RESULT STATISTICAL SCANNER · 4 CORE TABS · PRO MONEY ADVISOR · 2-LEVEL VERIFIED ENGINE ·
+          ⚡ 亗 𝗕ᴍᴡ 亗 𝗢ʙʟɪᴠɪᴏɴ 亗 𝗩𝟯 亗 · AUTHENTIC 3D CASINO WINGO BALLS · V3 QUANTUM NEURAL SCANNER · 4 CORE TABS · VIP HOSTESS ADVISOR · 3-LAYER QUANTUM ENGINE ·
         </div>
       </div>
 
@@ -749,7 +765,7 @@ export default function App() {
         )}
 
         {activeTab === 'stats' && (
-          <StatsView records={records} bestStreak={bestStreak} />
+          <StatsView records={records} bestStreak={bestStreak} recentNumbers={recentNumbers} />
         )}
 
         {activeTab === 'vip' && (
@@ -824,6 +840,8 @@ export default function App() {
         isSkipRecommended={prediction.isSkipRecommended}
         activePatternName={prediction.activePattern?.name || null}
         confidence={prediction.confidence}
+        oppNumber={prediction.oppNumber}
+        favNumber={prediction.favNumber}
       />
 
       {/* Win / Loss / Jackpot Overlay Celebration Modal */}

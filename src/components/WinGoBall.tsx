@@ -87,16 +87,21 @@ export const WinGoBall: React.FC<WinGoBallProps> = ({
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
       {/* Outer Pulse Glow Halo for Highlighted Balls */}
       {highlight && (
-        <div
-          className="absolute -inset-1 rounded-full animate-ping opacity-35 blur-[1px] pointer-events-none"
-          style={{ background: color === 'GREEN' ? '#10b981' : '#f43f5e' }}
-        />
+        <>
+          <div
+            className="absolute -inset-1 rounded-full animate-ping opacity-35 blur-[1px] pointer-events-none"
+            style={{ background: color === 'GREEN' ? '#10b981' : color === 'VIOLET' ? '#a855f7' : '#f43f5e' }}
+          />
+          <div
+            className="absolute -inset-2 rounded-full animate-quantumShockwave pointer-events-none"
+          />
+        </>
       )}
 
       {/* 3D Casino Lottery Sphere with Refined Specular Curvature */}
       <div
         className={`relative ${cfg.dim} rounded-full flex items-center justify-center font-['Orbitron'] font-black text-white ${cfg.text} transition-transform duration-200 ${
-          animate ? 'hover:scale-105 active:scale-95' : ''
+          animate ? 'animate-ballSpinHigh hover:scale-105 active:scale-95' : ''
         }`}
         style={{
           background: sphereBackground,
