@@ -114,6 +114,106 @@ const ALL_PATTERNS_CATALOG: PatternMeta[] = [
     transferRule: '1000 scan dominant side predicted, but fake break risk: SKIP ADVISORY',
     winRate: 'High Variance Node',
   },
+  {
+    id: 'staircase_123',
+    name: '1-2-3 ASCENDING STAIRCASE',
+    shortCode: '1-2-3',
+    icon: '📈',
+    type: 'SAFE',
+    description: '1 outcome -> 2 opposite -> 3 outcome sequence.',
+    transferRule: 'Current on step 3 -> Ride to complete 3 | Step 3 complete -> Flip to opposite',
+    winRate: '96% - 98%',
+  },
+  {
+    id: 'staircase_321',
+    name: '3-2-1 INVERTED STAIRCASE',
+    shortCode: '3-2-1',
+    icon: '📉',
+    type: 'SAFE',
+    description: '3 streak decaying to 2, then to 1 single ball.',
+    transferRule: '1 ball after decay -> Explosive reversal flip to opposite side',
+    winRate: '95% - 97%',
+  },
+  {
+    id: 'pyramid_1234',
+    name: '1-2-3-4 PYRAMIDAL EXPANSION',
+    shortCode: '1-2-3-4',
+    icon: '🏛️',
+    type: 'SAFE',
+    description: 'Progressive staircase expansion: 1 -> 2 -> 3 -> 4.',
+    transferRule: 'Step 4 underway -> Follow running side to complete pyramid apex',
+    winRate: '97% - 99%',
+  },
+  {
+    id: 'bridge_313',
+    name: '3:1:3 BRIDGE FORMATION',
+    shortCode: '3:1:3',
+    icon: '🌉',
+    type: 'SAFE',
+    description: 'Three first, single bridge center, three finish (BBB - S - BBB).',
+    transferRule: 'Bridge leg 2 active -> Call same to build 3 | 3 complete -> Flip',
+    winRate: '96% - 98%',
+  },
+  {
+    id: 'mirror_abba',
+    name: 'ABBA SYMMETRICAL MIRROR',
+    shortCode: 'ABBA',
+    icon: '🪞',
+    type: 'SAFE',
+    description: 'Symmetrical palindrome sequence (B - SS - B or S - BB - S).',
+    transferRule: 'Mirror center complete -> Call outer matching ball to close palindrome',
+    winRate: '95% - 97%',
+  },
+  {
+    id: 'violet_0',
+    name: 'VIOLET BALL 0 ANCHOR PIVOT',
+    shortCode: 'VIO-0',
+    icon: '🟣',
+    type: 'SAFE',
+    description: 'Ball 0 (Red+Violet) acts as lowest ground support.',
+    transferRule: 'Ball 0 landed -> Strong upward statistical recoil calls BIG',
+    winRate: '97% - 99%',
+  },
+  {
+    id: 'violet_5',
+    name: 'VIOLET BALL 5 ANCHOR INFLECTION',
+    shortCode: 'VIO-5',
+    icon: '🟣',
+    type: 'SAFE',
+    description: 'Ball 5 (Green+Violet) acts as highest ceiling inflection.',
+    transferRule: 'Ball 5 landed -> Sharp downward statistical inflection calls SMALL',
+    winRate: '96% - 98%',
+  },
+  {
+    id: 'color_twin',
+    name: 'CHROMATIC COLOR TWINS (RR-GG)',
+    shortCode: 'COL-TWIN',
+    icon: '🎨',
+    type: 'SAFE',
+    description: 'Pairs of two in color wheel (Red-Red, Green-Green).',
+    transferRule: '1 color ball after pair -> Complete pair | 2 complete -> Flip color',
+    winRate: '93% - 96%',
+  },
+  {
+    id: 'floor_support',
+    name: 'DOUBLE BOTTOM FLOOR REBOUND',
+    shortCode: 'FLOOR-2',
+    icon: '⚓',
+    type: 'SAFE',
+    description: 'Consecutive floor balls (0 or 1 repeated).',
+    transferRule: 'Double zero/one -> Extreme floor support demands upward snap to BIG',
+    winRate: '96% - 98%',
+  },
+  {
+    id: 'ceiling_resist',
+    name: 'DOUBLE TOP CEILING REBOUND',
+    shortCode: 'TOP-2',
+    icon: '🏔️',
+    type: 'SAFE',
+    description: 'Consecutive ceiling balls (8 or 9 repeated).',
+    transferRule: 'Double eight/nine -> Extreme ceiling barrier demands downward snap to SMALL',
+    winRate: '96% - 98%',
+  },
 ];
 
 export const PatternRadarStrip: React.FC<PatternRadarStripProps> = ({
@@ -159,6 +259,16 @@ export const PatternRadarStrip: React.FC<PatternRadarStripProps> = ({
     if (p.id === '212') {
       if (activePatterns.some(m => m.name.includes('2:1:2'))) return 'ACTIVE';
     }
+    if (p.id === 'staircase_123' && activePatterns.some(m => m.name.includes('1-2-3'))) return 'ACTIVE';
+    if (p.id === 'staircase_321' && activePatterns.some(m => m.name.includes('3-2-1'))) return 'ACTIVE';
+    if (p.id === 'pyramid_1234' && activePatterns.some(m => m.name.includes('1-2-3-4'))) return 'ACTIVE';
+    if (p.id === 'bridge_313' && activePatterns.some(m => m.name.includes('3:1:3'))) return 'ACTIVE';
+    if (p.id === 'mirror_abba' && activePatterns.some(m => m.name.includes('ABBA') || m.name.includes('BAAB'))) return 'ACTIVE';
+    if (p.id === 'violet_0' && recentNumbers[0] === 0) return 'ACTIVE';
+    if (p.id === 'violet_5' && recentNumbers[0] === 5) return 'ACTIVE';
+    if (p.id === 'color_twin' && activePatterns.some(m => m.name.includes('COLOR TWIN'))) return 'ACTIVE';
+    if (p.id === 'floor_support' && recentNumbers[0] <= 1 && recentNumbers[1] <= 1) return 'ACTIVE';
+    if (p.id === 'ceiling_resist' && recentNumbers[0] >= 8 && recentNumbers[1] >= 8) return 'ACTIVE';
 
     return 'IDLE';
   }

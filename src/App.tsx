@@ -19,6 +19,7 @@ import { PatternRadarStrip } from './components/PatternRadarStrip';
 import { BetAdvisorModal } from './components/BetAdvisorModal';
 import { VipView } from './components/VipView';
 import { CasinoHostessAvatar } from './components/CasinoHostessAvatar';
+import { LogicMatrixModal } from './components/LogicMatrixModal';
 import {
   Home,
   History as HistoryIcon,
@@ -107,6 +108,7 @@ export default function App() {
 
   // Modal / Overlay states
   const [showResultOverlay, setShowResultOverlay] = useState<boolean>(false);
+  const [showLogicMatrixModal, setShowLogicMatrixModal] = useState<boolean>(false);
   const [overlayOutcome, setOverlayOutcome] = useState<OutcomeType | null>(null);
   const [overlayActualNumber, setOverlayActualNumber] = useState<number | null>(null);
   const [overlayPeriod, setOverlayPeriod] = useState<string>('');
@@ -735,6 +737,7 @@ export default function App() {
               onCopyPrediction={copyPredictionReport}
               copyFeedback={copyFeedback}
               onOpenCalculator={() => setShowBetAdvisorModal(true)}
+              onOpenLogicMatrix={() => setShowLogicMatrixModal(true)}
             />
 
             {/* Pattern Transfer Radar Strip */}
@@ -843,6 +846,16 @@ export default function App() {
         oppNumber={prediction.oppNumber}
         favNumber={prediction.favNumber}
       />
+
+      {/* 220+ Quantum Logic Engine Matrix Modal */}
+      {prediction.logicConsensus && (
+        <LogicMatrixModal
+          isOpen={showLogicMatrixModal}
+          onClose={() => setShowLogicMatrixModal(false)}
+          consensus={prediction.logicConsensus}
+          currentPeriod={currentPeriod}
+        />
+      )}
 
       {/* Win / Loss / Jackpot Overlay Celebration Modal */}
       <ResultOverlay

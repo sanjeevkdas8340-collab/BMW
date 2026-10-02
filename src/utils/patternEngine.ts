@@ -1,5 +1,6 @@
 import { SEED_NUMBERS, getBallColor, getBallSize } from '../data/seedData';
-import { DeepPatternAnalysis, HistoricalBacktestResult, MarketRegime, PatternMatch, SizeType } from '../types';
+import { DeepPatternAnalysis, HistoricalBacktestResult, MarketRegime, PatternMatch, SizeType, LogicConsensusSummary } from '../types';
+import { compute220LogicConsensus } from './logic220Engine';
 
 export function getFullHistoricalDataset(liveNumbers: number[]): number[] {
   if (liveNumbers.length >= 1000) return liveNumbers.slice(0, 1000);
@@ -379,6 +380,299 @@ export function scanAllPatterns(recentNumbers: number[]): PatternMatch[] {
     }
   }
 
+  // -----------------------------------------------------------------
+  // PATTERN 14: ABBA SYMMETRICAL PALINDROME MIRROR
+  // -----------------------------------------------------------------
+  if (sizes.length >= 4 && sizes[0] === sizes[3] && sizes[1] === sizes[2] && sizes[0] !== sizes[1]) {
+    matches.push({
+      name: `ABBA SYMMETRICAL MIRROR (${sizes[3]}-${sizes[2]}${sizes[1]}-${sizes[0]})`,
+      icon: '🪞',
+      detail: `ABBA mirror palindrome detected [${sizes[3]} - ${sizes[2]} - ${sizes[1]} - ${sizes[0]}]. Mirror resolution calls ${sizes[1]}!`,
+      strength: 95,
+      category: 'mirror',
+      recommendedSize: sizes[1],
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 15: BAAB INVERTED MIRROR PALINDROME
+  // -----------------------------------------------------------------
+  if (sizes.length >= 4 && sizes[0] === sizes[3] && sizes[1] === sizes[2]) {
+    matches.push({
+      name: `BAAB INVERTED MIRROR (${sizes[3]}-${sizes[2]}${sizes[1]}-${sizes[0]})`,
+      icon: '🪞',
+      detail: `BAAB symmetry [${sizes[3]} - ${sizes[2]} - ${sizes[1]} - ${sizes[0]}]. Structural alignment favors ${sizes[0]}.`,
+      strength: 94,
+      category: 'mirror',
+      recommendedSize: sizes[0],
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 16: 3:1:3 BRIDGE FORMATION (BBB - S - BBB or SSS - B - SSS)
+  // -----------------------------------------------------------------
+  if (runs.length >= 3 && runs[2].count >= 3 && runs[1].count === 1) {
+    if (runs[0].count < 3) {
+      matches.push({
+        name: `3:1:3 BRIDGE FORMATION (${runs[2].size}×3 - ${runs[1].size}×1 - Build ${runs[0].size})`,
+        icon: '🌉',
+        detail: `3:1:3 bridge active [${runs[2].size}×3 - ${runs[1].size}×1]. Currently on ${runs[0].count}/3 ${runs[0].size}. Call ${runs[0].size} to complete bridge!`,
+        strength: 96,
+        category: 'ladder',
+        recommendedSize: runs[0].size,
+      });
+    } else if (runs[0].count >= 3) {
+      matches.push({
+        name: `3:1:3 BRIDGE RESOLUTION FLIP`,
+        icon: '🌉',
+        detail: `3:1:3 bridge complete [${runs[2].size}×3 - ${runs[1].size}×1 - ${runs[0].size}×3]. Cycle flip to ${oppositeSize}!`,
+        strength: 95,
+        category: 'ladder',
+        recommendedSize: oppositeSize,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 17: 1:3:1 GIANT SANDWICH (B - SSS - B or S - BBB - S)
+  // -----------------------------------------------------------------
+  if (runs.length >= 2 && runs[0].count === 3 && runs[1].count === 1) {
+    matches.push({
+      name: `1:3:1 GIANT SANDWICH (${runs[1].size}×1 - ${runs[0].size}×3 -> Call ${runs[1].size})`,
+      icon: '🥪',
+      detail: `1:3:1 rhythm [${runs[1].size}×1 - ${runs[0].size}×3]. Rule demands ${runs[1].size} to enclose giant sandwich!`,
+      strength: 96,
+      category: 'zigzag',
+      recommendedSize: runs[1].size,
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 18: 1-2-3 ASCENDING STAIRCASE (1 Big -> 2 Small -> 3 Big)
+  // -----------------------------------------------------------------
+  if (runs.length >= 3 && runs[2].count === 1 && runs[1].count === 2) {
+    if (runs[0].count < 3) {
+      matches.push({
+        name: `1-2-3 ASCENDING STAIRCASE (${runs[2].size}×1 - ${runs[1].size}×2 - Push ${runs[0].size})`,
+        icon: '📈',
+        detail: `Ascending staircase 1 -> 2 -> 3 active! Call ${runs[0].size} to complete 3rd stair step.`,
+        strength: 96,
+        category: 'ladder',
+        recommendedSize: runs[0].size,
+      });
+    } else {
+      matches.push({
+        name: `1-2-3 STAIRCASE CLIMAX FLIP`,
+        icon: '📈',
+        detail: `1-2-3 staircase fully formed! Reversal flip to ${oppositeSize} to start new cycle.`,
+        strength: 95,
+        category: 'ladder',
+        recommendedSize: oppositeSize,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 19: 1-2-3-4 PYRAMIDAL EXPANSION
+  // -----------------------------------------------------------------
+  if (runs.length >= 4 && runs[3].count === 1 && runs[2].count === 2 && runs[1].count === 3 && runs[0].count < 4) {
+    matches.push({
+      name: `1-2-3-4 PYRAMIDAL EXPANSION (${runs[0].size} Step 4)`,
+      icon: '🏛️',
+      detail: `1-2-3-4 pyramid expansion! 1 -> 2 -> 3 steps complete. Ride ${runs[0].size} for step 4!`,
+      strength: 97,
+      category: 'ladder',
+      recommendedSize: runs[0].size,
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 20: DOUBLE ARCH SSBB-SS MIRROR
+  // -----------------------------------------------------------------
+  if (sizes.length >= 5 && sizes[0] === 'SMALL' && sizes[1] === 'BIG' && sizes[2] === 'BIG' && sizes[3] === 'SMALL' && sizes[4] === 'SMALL') {
+    matches.push({
+      name: 'DOUBLE ARCH SSBB-SS COMPLETION',
+      icon: '🏛️',
+      detail: 'SS - BB - S formation detected: double arch demands SMALL to complete SS pair!',
+      strength: 97,
+      category: 'trap',
+      recommendedSize: 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 21: DOUBLE ARCH BBSS-BB MIRROR
+  // -----------------------------------------------------------------
+  if (sizes.length >= 5 && sizes[0] === 'BIG' && sizes[1] === 'SMALL' && sizes[2] === 'SMALL' && sizes[3] === 'BIG' && sizes[4] === 'BIG') {
+    matches.push({
+      name: 'DOUBLE ARCH BBSS-BB COMPLETION',
+      icon: '🏛️',
+      detail: 'BB - SS - B formation detected: double arch demands BIG to complete BB pair!',
+      strength: 97,
+      category: 'trap',
+      recommendedSize: 'BIG',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 22: VIOLET BALL 0 ANCHOR PIVOT (0 is Red+Violet -> Rebound to BIG)
+  // -----------------------------------------------------------------
+  if (recentNumbers[0] === 0) {
+    matches.push({
+      name: 'VIOLET BALL 0 ANCHOR REBOUND (-> BIG)',
+      icon: '🟣',
+      detail: 'Violet on Ball 0 landed! Ground-floor violet anchor creates explosive upward snap to BIG.',
+      strength: 98,
+      category: 'violet',
+      recommendedSize: 'BIG',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 23: VIOLET BALL 5 ANCHOR PIVOT (5 is Green+Violet -> Rebound to SMALL)
+  // -----------------------------------------------------------------
+  if (recentNumbers[0] === 5) {
+    matches.push({
+      name: 'VIOLET BALL 5 ANCHOR INFLECTION (-> SMALL)',
+      icon: '🟣',
+      detail: 'Violet on Ball 5 landed! Ceiling violet anchor creates sharp downward inflection to SMALL.',
+      strength: 97,
+      category: 'violet',
+      recommendedSize: 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 24: VIOLET AFTER-SHOCK RESONANCE (1 Round Post-Violet)
+  // -----------------------------------------------------------------
+  if (recentNumbers[1] === 0 || recentNumbers[1] === 5) {
+    const targetSize: SizeType = recentNumbers[1] === 0 ? 'BIG' : 'SMALL';
+    matches.push({
+      name: `VIOLET AFTER-SHOCK RESONANCE (Post-${recentNumbers[1]})`,
+      icon: '🔮',
+      detail: `Ball ${recentNumbers[1]} (Violet) landed 1 round ago. After-shock momentum confirms follow-through to ${targetSize}.`,
+      strength: 95,
+      category: 'violet',
+      recommendedSize: targetSize,
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 25: DOUBLE BOTTOM SUPPORT REBOUND (0 or 1 Repeated)
+  // -----------------------------------------------------------------
+  if (recentNumbers[0] <= 1 && recentNumbers[1] <= 1) {
+    matches.push({
+      name: 'DOUBLE BOTTOM SUPPORT REBOUND (Floor Bounce)',
+      icon: '⚓',
+      detail: `Consecutive low floor balls (${recentNumbers[1]}, ${recentNumbers[0]}). Massive structural support calls BIG!`,
+      strength: 96,
+      category: 'revert',
+      recommendedSize: 'BIG',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 26: DOUBLE TOP RESISTANCE CEILING (8 or 9 Repeated)
+  // -----------------------------------------------------------------
+  if (recentNumbers[0] >= 8 && recentNumbers[1] >= 8) {
+    matches.push({
+      name: 'DOUBLE TOP RESISTANCE CEILING (Ceiling Rebound)',
+      icon: '🏔️',
+      detail: `Consecutive ceiling balls (${recentNumbers[1]}, ${recentNumbers[0]}). Massive resistance barrier calls SMALL!`,
+      strength: 96,
+      category: 'revert',
+      recommendedSize: 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 27: 1:1 CHROMATIC COLOR ALTERNATION (Red - Green - Red)
+  // -----------------------------------------------------------------
+  if (colors.length >= 3 && colors[0] !== colors[1] && colors[1] !== colors[2]) {
+    const nextColor = colors[0] === 'RED' ? 'GREEN' : 'RED';
+    matches.push({
+      name: `CHROMATIC 1:1 COLOR ALTERNATION (Call ${nextColor})`,
+      icon: '🎨',
+      detail: `Alternating color sequence active (${colors[2]} - ${colors[1]} - ${colors[0]}). Rule demands flip to ${nextColor}!`,
+      strength: 93,
+      category: 'cycle',
+      recommendedSize: nextColor === 'GREEN' ? 'BIG' : 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 28: CHROMATIC COLOR TWINS (RR - GG - RR)
+  // -----------------------------------------------------------------
+  if (colors.length >= 3 && colors[0] === colors[1] && colors[1] !== colors[2]) {
+    const nextColor = colors[0] === 'RED' ? 'GREEN' : 'RED';
+    matches.push({
+      name: `CHROMATIC COLOR TWIN PAIR-FLIP (${colors[0]}×2 complete)`,
+      icon: '🎨',
+      detail: `Pair of 2 ${colors[0]} complete in twin color sequence. Flip to ${nextColor}!`,
+      strength: 92,
+      category: 'cycle',
+      recommendedSize: nextColor === 'GREEN' ? 'BIG' : 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 29: HIGH DIGIT SATURATION REBOUND (7, 8, 9 Clustered)
+  // -----------------------------------------------------------------
+  const highDigitsCount = recentNumbers.slice(0, 5).filter(n => n >= 7).length;
+  if (highDigitsCount >= 3) {
+    matches.push({
+      name: 'HIGH DIGIT SATURATION PULL (7-8-9 Overheated)',
+      icon: '🔥',
+      detail: `${highDigitsCount} out of last 5 balls were 7, 8, or 9. Severe overheating demands downward pull to SMALL!`,
+      strength: 94,
+      category: 'revert',
+      recommendedSize: 'SMALL',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 30: LOW DIGIT SATURATION REBOUND (0, 1, 2 Clustered)
+  // -----------------------------------------------------------------
+  const lowDigitsCount = recentNumbers.slice(0, 5).filter(n => n <= 2).length;
+  if (lowDigitsCount >= 3) {
+    matches.push({
+      name: 'LOW DIGIT SATURATION PULL (0-1-2 Overcooled)',
+      icon: '❄️',
+      detail: `${lowDigitsCount} out of last 5 balls were 0, 1, or 2. Severe cooling demands upward rebound to BIG!`,
+      strength: 94,
+      category: 'revert',
+      recommendedSize: 'BIG',
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 31: EXTENDED 2:2:2 TWIN HIGHWAY
+  // -----------------------------------------------------------------
+  if (runs.length >= 3 && runs[0].count === 2 && runs[1].count === 2 && runs[2].count === 2) {
+    matches.push({
+      name: 'EXTENDED 2:2:2 TWIN HIGHWAY (Pair 3 Complete)',
+      icon: '♊',
+      detail: `Three consecutive pairs of 2 complete [${runs[2].size}×2 - ${runs[1].size}×2 - ${runs[0].size}×2]. Clean flip to ${oppositeSize}!`,
+      strength: 96,
+      category: 'twin',
+      recommendedSize: oppositeSize,
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // PATTERN 32: SUPER DRAGON CLIMAX ACCELERATION (Streak >= 6)
+  // -----------------------------------------------------------------
+  if (streak >= 6) {
+    matches.push({
+      name: `SUPER DRAGON ACCELERATION (${currentSize} ×${streak})`,
+      icon: '🐲',
+      detail: `Ultra-strong ${currentSize} Dragon (${streak} consecutive rounds). Golden Dragon Rule: ride until structural break!`,
+      strength: 99,
+      category: 'dragon',
+      recommendedSize: currentSize,
+    });
+  }
+
   // Sort by strength descending
   matches.sort((a, b) => b.strength - a.strength);
   return matches;
@@ -605,6 +899,7 @@ export interface DualLevelPrediction {
   levelMultiplier: string;
   levelDefenseStatus: string;
   markovProb: { bigPct: number; smallPct: number };
+  logicConsensus: LogicConsensusSummary;
 }
 
 // ----------------------------------------------------
@@ -914,6 +1209,9 @@ export function generateDualLevelPrediction(
   const markov = computeMarkovOrderTransition(recentNumbers);
   const harmonic = computeHarmonicReversion(recentNumbers);
 
+  // 220+ QUANTUM LOGIC ENGINE CONSENSUS (225 Algorithmic Logic Rules Matrix)
+  const logicConsensus = compute220LogicConsensus(recentNumbers, currentLevel);
+
   let finalSize: SizeType = 'BIG';
   let finalConfidence = 80;
   let isTwoLevelVerified = false;
@@ -1151,5 +1449,6 @@ export function generateDualLevelPrediction(
     levelMultiplier,
     levelDefenseStatus,
     markovProb: { bigPct: markov.bigPct, smallPct: markov.smallPct },
+    logicConsensus,
   };
 }

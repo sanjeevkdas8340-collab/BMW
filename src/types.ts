@@ -2,6 +2,41 @@ export type SizeType = 'BIG' | 'SMALL';
 export type ColorType = 'GREEN' | 'RED' | 'VIOLET';
 export type OutcomeType = 'win' | 'loss' | 'jackpot';
 
+export type LogicCategory =
+  | 'PATTERN'
+  | 'OSCILLATOR'
+  | 'TREND_MA'
+  | 'HARMONIC_PARITY'
+  | 'COLOR_VIOLET'
+  | 'MARKOV_BAYES'
+  | 'HISTORICAL_1000'
+  | 'ANTI_LOSS_ARMOR';
+
+export interface LogicRuleResult {
+  id: number;
+  code: string;
+  name: string;
+  category: LogicCategory;
+  vote: 'BIG' | 'SMALL' | 'NEUTRAL';
+  confidence: number;
+  weight: number;
+  reason: string;
+}
+
+export interface LogicConsensusSummary {
+  totalLogics: number;
+  bigVotes: number;
+  smallVotes: number;
+  neutralVotes: number;
+  consensusSide: SizeType;
+  consensusPct: number;
+  weightedMargin: number;
+  strengthGrade: 'AAA+ ALPHA (99%)' | 'AA HIGH (92%)' | 'A DEFENSIVE (85%)' | 'SKIP AMBIGUOUS';
+  lossShieldActive: boolean;
+  topLogics: LogicRuleResult[];
+  allLogics: LogicRuleResult[];
+}
+
 export interface WinGoResultItem {
   issueNumber: string;
   number: string;
@@ -29,7 +64,7 @@ export interface PatternMatch {
   icon: string;
   detail: string;
   strength: number;
-  category: 'dragon' | 'twin' | 'zigzag' | 'ladder' | 'revert' | 'cycle' | 'parity' | 'pin' | 'trap';
+  category: 'dragon' | 'twin' | 'zigzag' | 'ladder' | 'revert' | 'cycle' | 'parity' | 'pin' | 'trap' | 'mirror' | 'violet';
   recommendedSize?: SizeType;
 }
 

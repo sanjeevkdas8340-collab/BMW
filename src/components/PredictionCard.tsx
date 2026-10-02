@@ -2,7 +2,7 @@ import React from 'react';
 import { SizeType } from '../types';
 import { WinGoBall } from './WinGoBall';
 import { DualLevelPrediction } from '../utils/patternEngine';
-import { Sparkles, Copy, ShieldCheck, Flame, Zap, Check, Lock, AlertTriangle, Calculator, Layers } from 'lucide-react';
+import { Sparkles, Copy, ShieldCheck, Flame, Zap, Check, Lock, AlertTriangle, Calculator, Layers, Cpu, ChevronRight } from 'lucide-react';
 import { playClickSound, playLockSound } from '../utils/sound';
 
 interface PredictionCardProps {
@@ -15,6 +15,7 @@ interface PredictionCardProps {
   onCopyPrediction: () => void;
   copyFeedback: boolean;
   onOpenCalculator?: () => void;
+  onOpenLogicMatrix?: () => void;
 }
 
 export const PredictionCard: React.FC<PredictionCardProps> = ({
@@ -27,6 +28,7 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
   onCopyPrediction,
   copyFeedback,
   onOpenCalculator,
+  onOpenLogicMatrix,
 }) => {
   const {
     predictedSize,
@@ -222,6 +224,49 @@ export const PredictionCard: React.FC<PredictionCardProps> = ({
                 {prediction.deepAnalysis.transitionEntropy}% {prediction.deepAnalysis.transitionEntropy > 60 ? '(HIGH)' : '(STABLE)'}
               </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 220+ Quantum Logic Engine Consensus Matrix Widget */}
+      {prediction.logicConsensus && (
+        <div className="my-2 p-2.5 rounded-xl bg-gradient-to-r from-[#0a1426] via-[#060b17] to-[#0a1224] border border-cyan-500/50 shadow-[0_0_15px_rgba(0,229,255,0.18)] text-[9px] font-['Orbitron'] space-y-1.5">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-1">
+            <span className="flex items-center gap-1.5 text-cyan-300 font-black">
+              <Cpu className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span>220+ LOGIC ENGINE CONSENSUS</span>
+            </span>
+            <button
+              onClick={() => {
+                playClickSound();
+                if (onOpenLogicMatrix) onOpenLogicMatrix();
+              }}
+              className="px-2 py-0.5 rounded-md font-['Orbitron'] font-black text-[8px] bg-cyan-950 border border-cyan-400/80 text-cyan-300 hover:text-white hover:bg-cyan-900 transition-all flex items-center gap-0.5 cursor-pointer"
+            >
+              <span>VIEW 225 LOGICS</span>
+              <ChevronRight className="w-2.5 h-2.5" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between text-[8px] pt-0.5">
+            <span className="text-slate-300">
+              VOTES: <strong className="text-emerald-400">{prediction.logicConsensus.bigVotes} BIG</strong> vs <strong className="text-rose-400">{prediction.logicConsensus.smallVotes} SMALL</strong>
+            </span>
+            <span className="px-1.5 py-0.2 rounded font-black text-[8px] bg-slate-900 border border-slate-700 text-amber-300">
+              {prediction.logicConsensus.consensusPct}% CONSENSUS ({prediction.logicConsensus.consensusSide})
+            </span>
+          </div>
+
+          {/* Dual-Color Voting Ratio Bar */}
+          <div className="h-1.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden flex">
+            <div
+              className="h-full bg-emerald-400 transition-all duration-300"
+              style={{ width: `${(prediction.logicConsensus.bigVotes / (prediction.logicConsensus.bigVotes + prediction.logicConsensus.smallVotes || 1)) * 100}%` }}
+            />
+            <div
+              className="h-full bg-rose-500 transition-all duration-300"
+              style={{ width: `${(prediction.logicConsensus.smallVotes / (prediction.logicConsensus.bigVotes + prediction.logicConsensus.smallVotes || 1)) * 100}%` }}
+            />
           </div>
         </div>
       )}
